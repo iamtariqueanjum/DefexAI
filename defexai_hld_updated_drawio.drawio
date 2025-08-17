@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<mxfile host="app.diagrams.net">
+  <diagram name="DefexAI HLD">
+&lt;mxGraphModel dx=&quot;1362&quot; dy=&quot;768&quot; grid=&quot;1&quot; gridSize=&quot;10&quot; guides=&quot;1&quot; tooltips=&quot;1&quot;
+    connect=&quot;1&quot; arrows=&quot;1&quot; fold=&quot;1&quot; page=&quot;1&quot; pageScale=&quot;1&quot; pageWidth=&quot;827&quot;
+    pageHeight=&quot;1169&quot; math=&quot;0&quot; shadow=&quot;0&quot;&gt;
+  &lt;root&gt;
+    &lt;mxCell id=&quot;0&quot;/&gt;
+    &lt;mxCell id=&quot;1&quot; parent=&quot;0&quot;/&gt;
+    &lt;!-- You can manually convert Graphviz shapes to draw.io here if needed --&gt;
+    &lt;mxCell id=&quot;2&quot; value=&quot;GitHub Repo&quot; style=&quot;shape=folder&quot; vertex=&quot;1&quot; parent=&quot;1&quot;&gt;
+      &lt;mxGeometry x=&quot;20&quot; y=&quot;20&quot; width=&quot;140&quot; height=&quot;60&quot; as=&quot;geometry&quot;/&gt;
+    &lt;/mxCell&gt;
+  &lt;/root&gt;
+&lt;/mxGraphModel&gt;
+</diagram>
+</mxfile>
