@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  api:
+    build: ./api
+    container_name: defexai_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./api:/app
+    environment:
+      - ENV=development
+
+  services:
+    build: ./services
+    container_name: defexai_services
+    volumes:
+      - ./services:/app
+    depends_on:
+      - api
+    environment:
+      - ENV=development
+
+  frontend:
+    build: ./frontend
+    container_name: defexai_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - api
