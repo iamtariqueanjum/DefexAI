@@ -1,0 +1,16 @@
+name: DefexAI Simple Review Trigger
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  trigger_defexai:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Webhook to FastAPI
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d '{"repo": "${{ github.repository }}", "pr_number": "${{ github.event.number }}"}' \
+            https://untyrannised-unfoamed-meryl.ngrok-free.dev/code/review

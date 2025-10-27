@@ -4,7 +4,11 @@ app = FastAPI()
 
 @app.post("/code/review")
 async def review_code(request: Request):
-    data = await request.json()
-    print("Webhook Triggered from GitHub!")
-    print("Payload:", data)
-    return {"status": "success"}
+    try:
+        data = await request.json()
+        print("Webhook Triggered from GitHub!")
+        print("Payload:", data)
+        return {"status": "success"}
+    except Exception as e:
+        print("Error:", e)
+        return {"status": "error", "message": str(e)}
