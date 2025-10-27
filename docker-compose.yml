@@ -1,32 +1,23 @@
+
 version: "3.9"
 
 services:
   api:
-    build: ./api
-    container_name: defexai_api
+    build:
+      context: ./api
     ports:
       - "8000:8000"
     volumes:
       - ./api:/app
     environment:
-      - ENV=development
-
-  services:
-    build: ./services
-    container_name: defexai_services
-    volumes:
-      - ./services:/app
-    depends_on:
-      - api
-    environment:
-      - ENV=development
+      - PYTHONUNBUFFERED=1
 
   frontend:
-    build: ./frontend
-    container_name: defexai_frontend
+    build:
+      context: ./frontend
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/app
-    depends_on:
-      - api
+    environment:
+      - NODE_ENV=development
