@@ -21,6 +21,7 @@ def gh_headers():
 def get_pr_refs(owner: str, repo: str, pr_number: int):
     """Get base/head refs for a PR"""
     url = f"{GITHUB_API}/repos/{owner}/{repo}/pulls/{pr_number}"
+    
     resp = requests.get(url, headers=gh_headers(), timeout=15)
     if resp.status_code != 200:
         raise HTTPException(status_code=502, detail=f"Failed to get PR info: {resp.text}")
@@ -29,7 +30,7 @@ def get_pr_refs(owner: str, repo: str, pr_number: int):
 
 
 
-def get_diff_from_github(owner: str, repo: str, base: str, head: str, max_bytes: int = 500_000):
+def get_diff_from_github(owner: str, repo: str, base: str, head: str, max_bytes: int = 500):
     """Fetch diff from GitHub compare endpoint"""
     url = f"{GITHUB_API}/repos/{owner}/{repo}/compare/{base}...{head}"
     headers = gh_headers()
