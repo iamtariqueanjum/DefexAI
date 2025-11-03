@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 import logging
 import sys
 
-from app.core.routers import code_reviewer
+from core.routers import code_reviewer
 
 # Configure logging so that module loggers (like app.core.routers.code_reviewer)
 # emit INFO+ messages to stdout. GitHub Actions captures stdout/stderr, so

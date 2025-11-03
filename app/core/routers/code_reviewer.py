@@ -1,8 +1,9 @@
 
 from fastapi import APIRouter, HTTPException
 import logging
+import os
 
-from app.core.ai_agent import analyze_code_diff
+from core.ai_agent import analyze_code_diff
 from .models import ReviewRequest
 from ..utils.git_utils import get_pr_refs, get_diff_from_github
 
@@ -34,12 +35,24 @@ async def review_code(payload: ReviewRequest):
         head = payload.head
 
         if payload.pr_number:
-            base, head = get_pr_refs(owner, repo, payload.pr_number, token=payload.github_token)
+            try:
+                # Read GitHub token from environment (do not accept token in payload)
+                token = os.getenv("GITHUB_TOKEN")
+                base, head = get_pr_refs(owner, repo, payload.pr_number, token=token)
+            except Exception:
+                logger.exception("Failed to fetch PR refs for %s/%s PR %s", owner, repo, payload.pr_number)
+                raise
 
         if not base or not head:
             raise HTTPException(status_code=400, detail="Provide either diff or base/head or pr_number")
 
-        diff_text, truncated = get_diff_from_github(owner, repo, base, head, payload.max_bytes, token=payload.github_token)
+        try:
+            token = os.getenv("GITHUB_TOKEN")
+            diff_text, truncated = get_diff_from_github(owner, repo, base, head, payload.max_bytes, token=token)
+            logger.info("Fetched diff for %s/%s %s...%s (truncated=%s)", owner, repo, base, head, truncated)
+        except Exception:
+            logger.exception("Failed to fetch diff for %s/%s %s...%s", owner, repo, base, head)
+            raise
     else:
         truncated = False
 
@@ -48,6 +61,8 @@ async def review_code(payload: ReviewRequest):
     try:
         ai_review = analyze_code_diff(diff_text)
     except Exception as e:
+        # Log stack trace for server-side debugging, then return a controlled 500 to client
+        logger.exception("AI analysis failed")
         raise HTTPException(status_code=500, detail=f"AI code review failed: {e}")
 
     return {
