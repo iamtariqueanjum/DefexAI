@@ -3,7 +3,6 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 model = os.getenv("MODEL", "gpt-4o-mini")
 
 
@@ -19,6 +18,15 @@ def analyze_code_diff(diff_text: str) -> str:
     Diff:
     {diff_text[:6000]}  # limiting for safety
     """
+
+    # Ensure an API key is configured. Create the client lazily so missing
+    # credentials produce a clear error rather than failing with an opaque
+    # exception at import time.
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENAI_API_KEY is not set. Set the environment variable or configure a secret.")
+
+    client = OpenAI(api_key=api_key)
 
     response = client.chat.completions.create(
         model=model,

@@ -34,12 +34,12 @@ async def review_code(payload: ReviewRequest):
         head = payload.head
 
         if payload.pr_number:
-            base, head = get_pr_refs(owner, repo, payload.pr_number)
+            base, head = get_pr_refs(owner, repo, payload.pr_number, token=payload.github_token)
 
         if not base or not head:
             raise HTTPException(status_code=400, detail="Provide either diff or base/head or pr_number")
 
-        diff_text, truncated = get_diff_from_github(owner, repo, base, head, payload.max_bytes)
+        diff_text, truncated = get_diff_from_github(owner, repo, base, head, payload.max_bytes, token=payload.github_token)
     else:
         truncated = False
 
