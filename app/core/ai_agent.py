@@ -12,12 +12,13 @@ def analyze_code_diff(diff_text: str) -> str:
     """
     prompt = f"""
     You are an experienced software engineer reviewing a GitHub pull request.
-    Analyze this code diff and identify potential bugs, performance issues,
-    or readability concerns. Suggest improvements concisely. 
-    Provide your response in markdown format in concise bullet points.
+    Analyze this code diff and List potential bugs , performance issues,
+    , readability concerns. Suggest improvements concisely based on PEP-8 and best coding practices
+    and best coding principles. 
+    Provide them in JSON format with "issue" and "suggestion" fields.
     Your response should be no more than 500 words.
     Diff:
-    {diff_text[:6000]}  # limiting for safety
+    ```{diff_text}```  
     """
 
     # Ensure an API key is configured. Create the client lazily so missing

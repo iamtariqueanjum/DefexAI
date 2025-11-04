@@ -49,7 +49,8 @@ async def review_code(payload: ReviewRequest):
         try:
             token = os.getenv("GITHUB_TOKEN")
             diff_text, truncated = get_diff_from_github(owner, repo, base, head, payload.max_bytes, token=token)
-            logger.info("Fetched diff for %s/%s %s...%s (truncated=%s)", owner, repo, base, head, truncated)
+            logger.info("Fetched diff for %s/%s %s...%s (truncated=%s) ", owner, repo, base, head, truncated)
+            logger.info("Diff content (first 500 chars): %s", diff_text[:500])
         except Exception:
             logger.exception("Failed to fetch diff for %s/%s %s...%s", owner, repo, base, head)
             raise
