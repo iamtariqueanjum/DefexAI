@@ -12,11 +12,36 @@ def analyze_code_diff(diff_text: str) -> str:
     """
     prompt = f"""
     You are an experienced software engineer reviewing a GitHub pull request.
-    Analyze this code diff and List potential bugs , performance issues,
-    , readability concerns. Suggest improvements concisely based on PEP-8 and best coding practices
-    and best coding principles. 
-    Provide them in JSON format with "issue" and "suggestion" fields.
-    Your response should be no more than 500 words.
+    Analyze this code diff and identify:
+    - Potential bugs
+    - Performance issues
+    - Readability concerns
+    - Security vulnerabilities
+    - Suggestions for improvement
+    - Best practices adherence
+    - Any other relevant issues
+
+    Suggest concise improvements following PEP-8 and general software engineering best practices.
+
+    Return your answer strictly as valid JSON (no markdown, no backticks, no extra text).
+
+    Sample output format:
+    {
+      "issues": [
+        {
+          "type": "bug|performance|readability|security|style|other",
+          "description": "Description of the issue",
+          "line_numbers": [12, 13],
+          "suggested_fix": "Suggested fix description"
+        },
+        {
+            "type": "performance",
+            "description": "Inefficient use of list comprehension",
+            "line_numbers": [45],
+            "suggested_fix": "Consider using a generator expression to reduce memory usage."
+        }
+        ],
+    }
     Diff:
     ```{diff_text}```  
     """
