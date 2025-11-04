@@ -18,7 +18,8 @@ async def review_code(payload: ReviewRequest):
     # Log the incoming payload for debugging / auditing
     try:
         # Use dict() so Pydantic model data is serialized; avoid heavy prints
-        logger.info("review_code payload: %s", payload.dict())
+        # TODO remove FUNKY 
+        logger.info("FUNKY review_code payload: %s", payload.dict())
     except Exception:
         # Fallback to repr() if dict() isn't available for some reason
         logger.info("review_code payload (repr): %s", repr(payload))
@@ -36,9 +37,10 @@ async def review_code(payload: ReviewRequest):
 
         if payload.pr_number:
             try:
-                # Read GitHub token from environment (do not accept token in payload)
                 token = os.getenv("GITHUB_TOKEN")
                 base, head = get_pr_refs(owner, repo, payload.pr_number, token=token)
+                # TODO remove FUNKY 
+                logger.info("FUNKY Fetched PR refs for %s/%s PR %s: %s...%s", owner, repo, payload.pr_number, base, head)
             except Exception:
                 logger.exception("Failed to fetch PR refs for %s/%s PR %s", owner, repo, payload.pr_number)
                 raise
@@ -49,7 +51,10 @@ async def review_code(payload: ReviewRequest):
         try:
             token = os.getenv("GITHUB_TOKEN")
             diff_text, truncated = get_diff_from_github(owner, repo, base, head, payload.max_bytes, token=token)
-            logger.info("Fetched diff for %s/%s %s...%s (truncated=%s)", owner, repo, base, head, truncated)
+            # TODO remove FUNKY 
+            logger.info("FUNKY Fetched diff for %s/%s %s...%s (truncated=%s) ", owner, repo, base, head, truncated)
+            # TODO remove FUNKY 
+            logger.info("FUNKY Diff content : %s", diff_text)
         except Exception:
             logger.exception("Failed to fetch diff for %s/%s %s...%s", owner, repo, base, head)
             raise

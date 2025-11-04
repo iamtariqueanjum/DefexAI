@@ -12,11 +12,37 @@ def analyze_code_diff(diff_text: str) -> str:
     """
     prompt = f"""
     You are an experienced software engineer reviewing a GitHub pull request.
-    Analyze this code diff and identify potential bugs, performance issues,
-    or readability concerns. Suggest improvements concisely.
+    Analyze this code diff and identify:
+    - Potential bugs
+    - Performance issues
+    - Readability concerns
+    - Security vulnerabilities
+    - Suggestions for improvement
+    - Best practices adherence
+    - Any other relevant issues
 
-    Diff:
-    {diff_text[:6000]}  # limiting for safety
+    Suggest concise improvements following PEP-8 and general software engineering best practices.
+
+    Return your answer strictly as valid JSON (no markdown, no backticks, no extra text).
+
+    Sample output format:
+    {{
+      "issues": [
+        {{
+          "type": "bug|performance|readability|security|style|other",
+          "description": "Description of the issue",
+          "line_numbers": [12, 13],
+          "suggested_fix": "Suggested fix description"
+        }},
+        {{
+            "type": "performance",
+            "description": "Inefficient use of list comprehension",
+            "line_numbers": [45],
+            "suggested_fix": "Consider using a generator expression to reduce memory usage."
+        }}
+        ]
+    }}
+    Diff: ```{diff_text}```  
     """
 
     # Ensure an API key is configured. Create the client lazily so missing
