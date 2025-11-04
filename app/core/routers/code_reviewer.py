@@ -18,7 +18,8 @@ async def review_code(payload: ReviewRequest):
     # Log the incoming payload for debugging / auditing
     try:
         # Use dict() so Pydantic model data is serialized; avoid heavy prints
-        logger.info("review_code payload: %s", payload.dict())
+        # TODO remove FUNKY 
+        logger.info("FUNKY review_code payload: %s", payload.dict())
     except Exception:
         # Fallback to repr() if dict() isn't available for some reason
         logger.info("review_code payload (repr): %s", repr(payload))

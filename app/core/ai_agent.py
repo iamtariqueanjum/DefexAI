@@ -26,24 +26,23 @@ def analyze_code_diff(diff_text: str) -> str:
     Return your answer strictly as valid JSON (no markdown, no backticks, no extra text).
 
     Sample output format:
-    {
+    {{
       "issues": [
-        {
+        {{
           "type": "bug|performance|readability|security|style|other",
           "description": "Description of the issue",
           "line_numbers": [12, 13],
           "suggested_fix": "Suggested fix description"
-        },
-        {
+        }},
+        {{
             "type": "performance",
             "description": "Inefficient use of list comprehension",
             "line_numbers": [45],
             "suggested_fix": "Consider using a generator expression to reduce memory usage."
-        }
-        ],
-    }
-    Diff:
-    ```{diff_text}```  
+        }}
+        ]
+    }}
+    Diff: ```{diff_text}```  
     """
 
     # Ensure an API key is configured. Create the client lazily so missing
