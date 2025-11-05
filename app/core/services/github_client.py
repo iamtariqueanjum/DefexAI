@@ -19,7 +19,7 @@ def get_pr_refs(owner: str, repo: str, pr_number: int, token: Optional[str] = No
     headers = {"Accept": "application/vnd.github+json"}
     if use_token:
         headers["Authorization"] = f"token {use_token}"
-
+    # TODO FUNKY exception handling and retries
     resp = requests.get(url, headers=headers, timeout=15)
     if resp.status_code != 200:
         raise HTTPException(status_code=resp.status_code, detail=f"Failed to get PR info: {resp.text}")
@@ -43,7 +43,7 @@ def get_diff_from_github(owner: str, repo: str, base: str, head: str, max_bytes:
     headers = {"Accept": "application/vnd.github.v3.diff"}
     if token:
         headers["Authorization"] = f"token {token}"
-
+    # TODO FUNKY exception handling and retries
     resp = requests.get(url, headers=headers, stream=True, timeout=60)
     if resp.status_code != 200:
         raise HTTPException(status_code=resp.status_code, detail=f"GitHub compare failed: {resp.text}")

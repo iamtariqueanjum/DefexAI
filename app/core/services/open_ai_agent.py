@@ -1,4 +1,5 @@
 import os
+import json
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -10,6 +11,7 @@ def analyze_code_diff(diff_text: str) -> str:
     """
     Use GPT to analyze a diff and provide concise review feedback.
     """
+    # TODO FUNKY prompt move to constants/file
     prompt = f"""
     You are an experienced software engineer reviewing a GitHub pull request.
     Analyze this code diff and identify:
@@ -54,9 +56,13 @@ def analyze_code_diff(diff_text: str) -> str:
 
     client = OpenAI(api_key=api_key)
 
+    # TODO FUNKY exception handling and retries
     response = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
     )
-    return response.choices[0].message.content
+    content = response.choices[0].message.content
+    ai_agent_response = json.loads(content)
+    return ai_agent_response.get("issues", [])
+
