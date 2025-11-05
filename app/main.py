@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 import logging
 import sys
 
-from core.routers import code_reviewer
+from app.core.routers.code_reviewer import router
 
 # Configure logging so that module loggers (like app.core.routers.code_reviewer)
 # emit INFO+ messages to stdout. GitHub Actions captures stdout/stderr, so
@@ -14,4 +14,8 @@ logging.basicConfig(
 )
 
 app = FastAPI(title="DefexAI Code Reviewer")
-app.include_router(code_reviewer.router)
+app.include_router(router)
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "message": "App is running healthy!"}
