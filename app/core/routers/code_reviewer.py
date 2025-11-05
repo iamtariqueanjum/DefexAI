@@ -23,4 +23,4 @@ async def analyze_code(payload: dict):
         if not payload_dict.get(field):
             raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
     await publish_message(QueueConstants.CODE_REVIEW_QUEUE, payload.dict())
-    return {"status": "success", "message": "Code review request published."}
+    return {"status": "success", "message": "Code review request published to queue."}
