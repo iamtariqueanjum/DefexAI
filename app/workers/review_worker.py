@@ -23,7 +23,7 @@ async def main():
                 #     "pr_number": payload.get("pr_number"),
                 #     "review_result": review_result
                 # })
-                printf("Review done: ", review_result)
+                print("Review done: ", review_result)
 
     
 if __name__ == "__main__":
