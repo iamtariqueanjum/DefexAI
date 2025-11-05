@@ -1,4 +1,5 @@
 import os
+import json
 from openai import OpenAI
 from dotenv import load_dotenv
 
@@ -59,4 +60,7 @@ def analyze_code_diff(diff_text: str) -> str:
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
     )
-    return response.choices[0].message.content
+    content = response.choices[0].message.content
+    ai_agent_response = json.loads(content)
+    return ai_agent_response.get("issues", [])
+
