@@ -18,12 +18,12 @@ async def main():
                 payload = json.loads(message.body)
                 print(f"Received review task for payload: {payload}")
                 review_result = await review_code(payload)
-                print(f"Review complete: {payload}")
                 # await publish_message(QueueConstants.COMMENT_QUEUE, {
                 #     "repo": payload.get("repo"),
                 #     "pr_number": payload.get("pr_number"),
                 #     "review_result": review_result
                 # })
+                printf("Review done: ", review_result)
 
     
 if __name__ == "__main__":
