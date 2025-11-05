@@ -3,14 +3,15 @@ import asyncio
 import json
 
 from app.core.rabbit_mq.connection import get_connection
-from core.services.review_service import review_code
-from core.utils.constants import QueueConstants
+from app.core.services.review_service import review_code
+from app.core.utils.constants import QueueConstants
 
 
 async def main():
     connection = await get_connection()
     channel = await connection.channel()
     queue = await channel.declare_queue(QueueConstants.CODE_REVIEW_QUEUE, durable=True)
+    print("Worker is ready to receive messages....")
     async with queue.iterator() as queue_iter:
         async for message in queue_iter:
             async with message.process():

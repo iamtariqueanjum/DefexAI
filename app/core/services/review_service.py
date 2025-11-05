@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 async def review_code(payload: ReviewRequest):
-    diff_text = payload.diff
+    diff_text = payload.get('diff')
     # Log the incoming payload for debugging / auditing
     try:
         # Use dict() so Pydantic model data is serialized; avoid heavy prints
