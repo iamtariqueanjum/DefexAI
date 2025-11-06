@@ -8,6 +8,8 @@ from fastapi import HTTPException
 
 GITHUB_API = "https://api.github.com"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+GITHUB_BOT_TOKEN = os.getenv("GITHUB_BOT_TOKEN")
+
 
 logger = logging.getLogger(__name__)
 
@@ -71,12 +73,12 @@ async def post_comment_to_github(payload):
     review_result = payload.get("review_result")
 
     # TODO FUNKY check later 
-    if not GITHUB_TOKEN:
-        raise HTTPException(status_code=400, detail="GITHUB_TOKEN not set in global env")
+    if not GITHUB_BOT_TOKEN:
+        raise HTTPException(status_code=400, detail="GITHUB_BOT_TOKEN not set in global env")
 
     comment_body = f"{review_result}"
     url = f"{GITHUB_API}/repos/{repo}/issues/{pr_number}/comments"
-    headers = {"Authorization": f"Bearer {GITHUB_TOKEN}"}
+    headers = {"Authorization": f"Bearer {GITHUB_BOT_TOKEN}"}
     
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json={"body": comment_body})
