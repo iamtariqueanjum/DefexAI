@@ -72,10 +72,6 @@ async def post_comment_to_github(payload):
     pr_number = payload.get("pr_number")
     review_result = payload.get("review_result")
 
-    # TODO FUNKY check later 
-    if not GITHUB_BOT_TOKEN:
-        raise HTTPException(status_code=400, detail="GITHUB_BOT_TOKEN not set in global env")
-
     comment_body = f"{review_result}"
     url = f"{GITHUB_API}/repos/{repo}/issues/{pr_number}/comments"
     headers = {"Authorization": f"Bearer {GITHUB_BOT_TOKEN}"}
