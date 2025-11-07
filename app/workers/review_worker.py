@@ -28,7 +28,8 @@ async def main():
                     await publish_message(QueueConstants.COMMENT_QUEUE, {
                         "repo": payload.get("repo"),
                         "pr_number": payload.get("pr_number"),
-                        "review_result": review_comment
+                        "review_result": review_comment,
+                        "github_token": payload.get("github_token")
                     })
                     print(f"Review submitted to comment worker queue: {QueueConstants.COMMENT_QUEUE}")
             except Exception as e:

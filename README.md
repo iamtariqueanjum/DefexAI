@@ -36,8 +36,8 @@ Create a `.env` file in the project root (or export them in your shell):
 # Required
 OPENAI_API_KEY=your_openai_api_key_here
 
-# Optional (for GitHub API access - increases rate limits and enables private repos)
-GITHUB_TOKEN=your_github_personal_access_token_here
+# Required (for posting comments to GitHub PRs)
+GITHUB_BOT_TOKEN=your_github_personal_access_token_here
 
 # Optional (defaults to localhost if not set)
 RABBITMQ_URL=amqp://guest:guest@localhost/
@@ -47,6 +47,33 @@ MODEL=gpt-4o-mini
 ```
 
 **Note:** The application uses `python-dotenv` to load environment variables from a `.env` file automatically.
+
+#### Setting up GitHub Bot Token
+
+To post comments on GitHub PRs, you need to create a GitHub Personal Access Token (PAT) for your bot user:
+
+1. **Create a GitHub Personal Access Token:**
+   - Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+   - Click "Generate new token (classic)"
+   - Give it a descriptive name (e.g., "DefexAI Bot Token")
+   - Select the following scopes:
+     - `repo` (Full control of private repositories) - for private repos
+     - OR `public_repo` (Access public repositories) - for public repos only
+   - Click "Generate token"
+   - **Copy the token immediately** (you won't be able to see it again)
+
+2. **Set the token as an environment variable:**
+   - Add it to your `.env` file as `GITHUB_BOT_TOKEN=your_token_here`
+   - Or export it: `export GITHUB_BOT_TOKEN=your_token_here`
+
+3. **Optional: Store as GitHub Secret (for reference):**
+   - Go to your repository → Settings → Secrets and variables → Actions
+   - Click "New repository secret"
+   - Name: `DEFEXAI_BOT_TOKEN`
+   - Value: Paste your bot token
+   - Click "Add secret"
+   
+   **Note:** The workflow doesn't currently use this secret, but storing it here is useful for reference and future use.
 
 ### 5. Start RabbitMQ (if using async processing)
 
