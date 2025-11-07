@@ -18,17 +18,29 @@ async def main():
             try:
                 async with message.process():
                     payload = json.loads(message.body)
-                    print(f"Received review task for payload: {payload}")
+                    # Log payload without exposing full token
+                    payload_log = {k: v for k, v in payload.items() if k != "github_token"}
+                    payload_log["github_token"] = f"{payload.get('github_token', '')[:7]}...***" if payload.get("github_token") else "MISSING"
+                    print(f"Received review task for payload: {payload_log}")
+                    
+                    if not payload.get("github_token"):
+                        print("WARNING: github_token is missing from review payload!")
+                    
                     review_result = await review_code(payload)
                     print("Review done: ", review_result)
                     
                     # Format review result as a readable comment string
                     review_comment = format_review_result(review_result)
                     
+                    github_token = payload.get("github_token")
+                    if not github_token:
+                        print("ERROR: Cannot publish to comment queue - github_token is missing!")
+                    
                     await publish_message(QueueConstants.COMMENT_QUEUE, {
                         "repo": payload.get("repo"),
                         "pr_number": payload.get("pr_number"),
-                        "review_result": review_comment
+                        "review_result": review_comment,
+                        "github_token": github_token
                     })
                     print(f"Review submitted to comment worker queue: {QueueConstants.COMMENT_QUEUE}")
             except Exception as e:

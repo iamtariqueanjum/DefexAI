@@ -9,5 +9,6 @@ class ReviewRequest(BaseModel):
     base: Optional[str] = None
     head: Optional[str] = None
     max_bytes: int = 500
+    github_token: str  # Required: GitHub token for API authentication
     
     
