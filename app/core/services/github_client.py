@@ -83,6 +83,17 @@ async def post_comment_to_github(payload, token: Optional[str] = None):
             status_code=401,
             detail="GitHub token is required. Provide github_token in payload."
         )
+    
+    # Strip whitespace from token (common issue when copying from secrets)
+    token = token.strip()
+    
+    # Validate token format (GitHub PATs start with ghp_, OAuth tokens start with github_pat_)
+    if not (token.startswith("ghp_") or token.startswith("github_pat_") or token.startswith("gho_")):
+        logger.warning(f"Token format may be invalid. Expected format: ghp_... or github_pat_... or gho_...")
+    
+    # Log token info (masked for security)
+    token_preview = f"{token[:7]}...{token[-4:]}" if len(token) > 11 else "***"
+    logger.info(f"Posting comment to {repo} PR #{pr_number} using token: {token_preview}")
 
     comment_body = f"{review_result}"
     url = f"{GITHUB_API}/repos/{repo}/issues/{pr_number}/comments"
@@ -94,5 +105,12 @@ async def post_comment_to_github(payload, token: Optional[str] = None):
     async with httpx.AsyncClient() as client:
         response = await client.post(url, headers=headers, json={"body": comment_body})
         if response.status_code != 201:
-            raise HTTPException(status_code=response.status_code, detail=f"Failed to post comment: {response.text}")
+            error_detail = response.text
+            if response.status_code == 401:
+                error_detail = (
+                    f"Bad credentials - Token may be invalid, expired, or missing required scopes. "
+                    f"Ensure the token has 'repo' scope for private repos or 'public_repo' for public repos. "
+                    f"Response: {response.text}"
+                )
+            raise HTTPException(status_code=response.status_code, detail=error_detail)
     logger.info(f"Comment Posted repo:{repo} - Pr Number: {pr_number}")

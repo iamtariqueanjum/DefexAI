@@ -16,7 +16,14 @@ async def main():
             try:
                 async with message.process():
                     payload = json.loads(message.body)
-                    print(f"Comment post task for payload: {payload}")
+                    # Log payload without exposing token
+                    payload_log = {k: v for k, v in payload.items() if k != "github_token"}
+                    payload_log["github_token"] = "***" if payload.get("github_token") else "MISSING"
+                    print(f"Comment post task for payload: {payload_log}")
+                    
+                    if not payload.get("github_token"):
+                        print("ERROR: github_token is missing from payload!")
+                    
                     await post_comment_to_github(payload)
                     print("Comment posted successfully")
             except Exception as e:
