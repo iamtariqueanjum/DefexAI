@@ -15,10 +15,10 @@ jobs:
         run: |
           curl -X POST "https://untyrannised-unfoamed-meryl.ngrok-free.dev/code/review" \
             -H "Content-Type: application/json" \
-            -d '{
-              "repo": "${{ github.repository }}",
-              "base": "${{ github.event.pull_request.base.ref }}",
-              "head": "${{ github.event.pull_request.head.ref }}",
-              "pr_number": ${{ github.event.pull_request.number }},
-              "github_token": "$BOT_TOKEN"
-            }'
+            -d "{
+              \"repo\": \"${{ github.repository }}\",
+              \"base\": \"${{ github.event.pull_request.base.ref }}\",
+              \"head\": \"${{ github.event.pull_request.head.ref }}\",
+              \"pr_number\": ${{ github.event.pull_request.number }},
+              \"github_token\": \"$BOT_TOKEN\"
+            }"
