@@ -3,7 +3,7 @@ import os
 
 class QueueConstants:
     CODE_REVIEW_QUEUE = "code_review_queue"
-    COMMENT_QUEUE = "comment_queue"
+    GITHUB_COMMENT_QUEUE = "github_comment_queue"
 
 
 # TODO FUNKY move to environment variables
