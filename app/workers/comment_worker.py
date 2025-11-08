@@ -1,36 +1,45 @@
 import asyncio
-import json
+import logging
 
-from app.core.rabbit_mq.connection import get_connection
+from app.celery_app import app
 from app.core.services.github_client import post_comment_to_github
-from app.core.utils.constants import QueueConstants
+
+logger = logging.getLogger(__name__)
 
 
-async def main():
-    connection = await get_connection()
-    channel = await connection.channel()
-    queue = await channel.declare_queue(QueueConstants.COMMENT_QUEUE, durable=True)
-    print(f"Comment Worker is ready to receive messages from queue: {QueueConstants.COMMENT_QUEUE}")
-    async with queue.iterator() as queue_iter:
-        async for message in queue_iter:
-            try:
-                async with message.process():
-                    payload = json.loads(message.body)
-                    # Log payload without exposing token
-                    payload_log = {k: v for k, v in payload.items() if k != "github_token"}
-                    payload_log["github_token"] = "***" if payload.get("github_token") else "MISSING"
-                    print(f"Comment post task for payload: {payload_log}")
-                    
-                    if not payload.get("github_token"):
-                        print("ERROR: github_token is missing from payload!")
-                    
-                    await post_comment_to_github(payload)
-                    print("Comment posted successfully")
-            except Exception as e:
-                print(f"Error processing message: {e}")
-                import traceback
-                traceback.print_exc()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+@app.task(bind=True, name="defexai.post_comment_worker")
+def post_comment_worker(self, payload: dict):
+    """
+    Celery task to post a comment to a GitHub PR.
+    Args:
+        payload: Dictionary containing:
+            - repo: Repository name (e.g., "owner/repo")
+            - pr_number: Pull request number
+            - review_result: The review comment text to post
+            - github_token: GitHub token for authentication
+    
+    Returns:
+        Dictionary with status and details
+    """
+    try:
+        # Log payload without exposing token
+        payload_log = {k: v for k, v in payload.items() if k != "github_token"}
+        payload_log["github_token"] = "***" if payload.get("github_token") else "MISSING"
+        logger.info(f"Processing comment task for payload: {payload_log}")
+        
+        if not payload.get("github_token"):
+            logger.error("ERROR: github_token is missing from payload!")
+            raise ValueError("github_token is required")
+        
+        # Run async post_comment_to_github function in sync context
+        asyncio.run(post_comment_to_github(payload))
+        logger.info(f"Comment posted successfully to {payload.get('repo')} PR #{payload.get('pr_number')}")
+        
+        return {
+            "status": "success",
+            "repo": payload.get("repo"),
+            "pr_number": payload.get("pr_number")
+        }
+    except Exception as e:
+        logger.error(f"Error in post_comment_task: {e}", exc_info=True)
+        raise
