@@ -1,68 +1,57 @@
 import os
-import json
+import logging
 from openai import OpenAI
 from dotenv import load_dotenv
+
+from app.core.utils.prompts import get_code_review_prompt
 
 load_dotenv()
 model = os.getenv("MODEL", "gpt-4o-mini")
 
+logger = logging.getLogger(__name__)
+
 
 def analyze_code_diff(diff_text: str) -> str:
     """
-    Use GPT to analyze a diff and provide concise review feedback.
+    Analyze a code diff using OpenAI and return a Markdown-formatted review.
+    
+    Args:
+        diff_text: The code diff to analyze
+        
+    Returns:
+        Markdown string containing the code review
+        
+    Raises:
+        RuntimeError: If OPENAI_API_KEY is not set or API call fails
+        ValueError: If the API response is empty
     """
-    # TODO FUNKY prompt move to constants/file
-    prompt = f"""
-    You are an experienced software engineer reviewing a GitHub pull request.
-    Analyze this code diff and identify:
-    - Potential bugs
-    - Performance issues
-    - Readability concerns
-    - Security vulnerabilities
-    - Suggestions for improvement
-    - Best practices adherence
-    - Any other relevant issues
+    prompt = get_code_review_prompt(diff_text)
 
-    Suggest concise improvements following PEP-8 and general software engineering best practices.
-
-    Return your answer strictly as valid JSON (no markdown, no backticks, no extra text).
-
-    Sample output format:
-    {{
-      "issues": [
-        {{
-          "type": "bug|performance|readability|security|style|other",
-          "description": "Description of the issue",
-          "line_numbers": [12, 13],
-          "suggested_fix": "Suggested fix description"
-        }},
-        {{
-            "type": "performance",
-            "description": "Inefficient use of list comprehension",
-            "line_numbers": [45],
-            "suggested_fix": "Consider using a generator expression to reduce memory usage."
-        }}
-        ]
-    }}
-    Diff: ```{diff_text}```  
-    """
-
-    # Ensure an API key is configured. Create the client lazily so missing
-    # credentials produce a clear error rather than failing with an opaque
-    # exception at import time.
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is not set. Set the environment variable or configure a secret.")
 
     client = OpenAI(api_key=api_key)
 
-    # TODO FUNKY exception handling and retries
-    response = client.chat.completions.create(
-        model=model,
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.4,
-    )
-    content = response.choices[0].message.content
-    ai_agent_response = json.loads(content)
-    return ai_agent_response.get("issues", [])
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.4,
+        )
+        content = response.choices[0].message.content
+        
+        # Validate response content
+        if not content or not content.strip():
+            logger.error("OpenAI returned empty response")
+            raise ValueError("OpenAI API returned an empty response")
+        
+        logger.info(f"Code review completed. Received {len(content)} characters of Markdown review.")
+        return content.strip()
+        
+    except ValueError as e:
+        raise
+    except Exception as e:
+        logger.error(f"Error during code analysis: {e}", exc_info=True)
+        raise RuntimeError(f"Failed to analyze code diff: {e}") from e
 
