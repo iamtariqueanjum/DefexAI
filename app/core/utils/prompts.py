@@ -80,7 +80,6 @@ Write 2–3 short lines summarizing overall quality and the key issues found (fr
 
 Now, review the following diff and produce your Markdown output:
 
-
 Diff: ```{diff_text}```  
 """
 
