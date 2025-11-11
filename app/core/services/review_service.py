@@ -68,7 +68,7 @@ async def review_code(payload):
     if not diff_text.strip():
         raise HTTPException(status_code=400, detail="Empty diff (no changes found)")
     try:
-        review_issues = analyze_code_diff(diff_text)
+        review_markdown = analyze_code_diff(diff_text)
     except Exception as e:
         # Log stack trace for server-side debugging, then return a controlled 500 to client
         logger.exception("AI analysis failed")
@@ -76,5 +76,5 @@ async def review_code(payload):
 
     return {
         "truncated": truncated,
-        "issues": review_issues
+        "review": review_markdown
     }

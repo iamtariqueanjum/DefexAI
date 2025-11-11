@@ -50,11 +50,14 @@ Write 2–3 short lines summarizing overall quality and the key issues found (fr
 - Use concise, developer-friendly language.
 - Prefer Markdown tables for readability.
 - Use severity indicators: 🟢 Low, 🟡 Medium, 🔴 High.
-- Do **not** include JSON or code fences in your output — only Markdown.
-- If multiple files are modified, list each file in “Files Reviewed” and “Detailed Review”.
+- Return ONLY pure Markdown text - no JSON, no code fences, no markdown code blocks.
+- Start directly with your summary text and table - do not wrap your response in any formatting.
+- If multiple files are modified, list each file in the review table.
+- If no issues are found, return a friendly message saying the code looks good.
+
 ---
 
-Now, review the following diff and produce your Markdown output:
+Now, review the following diff and return your Markdown review (no code fences, no JSON, just pure Markdown):
 
 Diff: ```{diff_text}```  
 """

@@ -1,5 +1,4 @@
 import os
-import json
 import logging
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -12,19 +11,19 @@ model = os.getenv("MODEL", "gpt-4o-mini")
 logger = logging.getLogger(__name__)
 
 
-def analyze_code_diff(diff_text: str) -> list:
+def analyze_code_diff(diff_text: str) -> str:
     """
-    Analyze a code diff using OpenAI and return a list of issues.
+    Analyze a code diff using OpenAI and return a Markdown-formatted review.
     
     Args:
         diff_text: The code diff to analyze
         
     Returns:
-        List of issues found in the code diff
+        Markdown string containing the code review
         
     Raises:
-        RuntimeError: If OPENAI_API_KEY is not set
-        ValueError: If the API response cannot be parsed
+        RuntimeError: If OPENAI_API_KEY is not set or API call fails
+        ValueError: If the API response is empty
     """
     prompt = get_code_review_prompt(diff_text)
 
@@ -41,15 +40,18 @@ def analyze_code_diff(diff_text: str) -> list:
             temperature=0.4,
         )
         content = response.choices[0].message.content
-        ai_agent_response = json.loads(content)
-        issues = ai_agent_response.get("issues", [])
-        logger.info(f"Code review completed. Found {len(issues)} issues.")
-        return issues
-    except json.JSONDecodeError as e:
-        logger.error(f"Failed to parse JSON response from OpenAI: {e}")
-        logger.error(f"Response content: {content[:500]}")
-        raise ValueError(f"Invalid JSON response from OpenAI: {e}")
+        
+        # Validate response content
+        if not content or not content.strip():
+            logger.error("OpenAI returned empty response")
+            raise ValueError("OpenAI API returned an empty response")
+        
+        logger.info(f"Code review completed. Received {len(content)} characters of Markdown review.")
+        return content.strip()
+        
+    except ValueError as e:
+        raise
     except Exception as e:
         logger.error(f"Error during code analysis: {e}", exc_info=True)
-        raise
+        raise RuntimeError(f"Failed to analyze code diff: {e}") from e
 

@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 
 def format_review_result(review_result: Dict[str, Any]) -> str:
@@ -7,39 +7,26 @@ def format_review_result(review_result: Dict[str, Any]) -> str:
     
     Args:
         review_result: Dictionary containing review results with keys:
-            - "issues": List of issue dictionaries
+            - "review": Markdown string containing the AI-generated review
             - "truncated": Boolean indicating if diff was truncated
     
     Returns:
         Formatted markdown string ready to be posted as a GitHub comment
     """
-    issues = review_result.get("issues", [])
+    review_markdown = review_result.get("review", "")
+    truncated = review_result.get("truncated", False)
     
-    if not issues:
+    if not review_markdown or not review_markdown.strip():
         return "## Code Review Results\n\n✅ No issues found!"
     
-    comment_lines = ["## Code Review Results\n"]
+    # Start with the AI-generated review
+    comment_lines = [review_markdown.strip()]
     
-    for issue in issues:
-        issue_type = issue.get("type", "other")
-        description = issue.get("description", "")
-        line_numbers = issue.get("line_numbers", [])
-        suggested_fix = issue.get("suggested_fix", "")
-        
-        comment_lines.append(f"### {issue_type.upper()}")
-        
-        if line_numbers:
-            comment_lines.append(f"**Lines:** {', '.join(map(str, line_numbers))}")
-        
-        comment_lines.append(f"**Issue:** {description}")
-        
-        if suggested_fix:
-            comment_lines.append(f"**Suggestion:** {suggested_fix}")
-        
+    # Add truncation note if applicable
+    if truncated:
         comment_lines.append("")
-    
-    if review_result.get("truncated"):
+        comment_lines.append("---")
         comment_lines.append("_Note: Diff was truncated due to size limits._")
     
-    return "\n".join(comment_lines)
+    return "\n\n".join(comment_lines)
 
